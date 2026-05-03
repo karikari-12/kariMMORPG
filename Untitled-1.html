@@ -2344,7 +2344,7 @@ function updateProjectiles(){
 // ── PLAYER UPDATE ───────────────────────────────────────
 function updatePlayer(){
   const p=GS.player;
-  if(p.dead||GS.transition||GS.shopOpen||GS.skillShopOpen||GS.itemMenuOpen||GS.forgeOpen) return;
+  if(p.dead||GS.transition||GS.shopOpen||GS.skillShopOpen||GS.itemMenuOpen||GS.forgeOpen||GS.itemShopOpen) return;
   const k=GS.keys;let mx=0,my=0;
   if(k['KeyW']||k['ArrowUp'])    my=-1;if(k['KeyS']||k['ArrowDown'])  my=1;
   if(k['KeyA']||k['ArrowLeft'])  {mx=-1;p.facing='left';}if(k['KeyD']||k['ArrowRight']) {mx=1;p.facing='right';}
@@ -3198,6 +3198,12 @@ function jStart(cx,cy){
   jBase.style.display='block';jKnob.style.display='block';
 }
 function jMove(cx,cy){
+  // ショップ/スキル屋/アイテム屋が開いている間は移動しない
+  if(GS.shopOpen||GS.skillShopOpen||GS.itemMenuOpen||GS.forgeOpen||GS.itemShopOpen){
+    jKnob.style.left=jOx+'px';jKnob.style.top=jOy+'px';
+    GS.keys['KeyW']=GS.keys['KeyS']=GS.keys['KeyA']=GS.keys['KeyD']=false;
+    return;
+  }
   let dx=cx-jOx,dy=cy-jOy;
   const d=Math.hypot(dx,dy);
   if(d>JMAX){dx=dx/d*JMAX;dy=dy/d*JMAX;}
