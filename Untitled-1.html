@@ -1135,6 +1135,7 @@ function transitionTo(idx){
   GS.transition=true;
   GS.shopOpen=GS.skillShopOpen=GS.itemMenuOpen=GS.itemShopOpen=false;
   ['shopOverlay','skillShopOverlay','itemOverlay'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  if(typeof updateJoyZone==='function') updateJoyZone();
   GS.enemies=[];GS.projectiles=[];GS.boss=null;GS.bossWave=false;GS.bombs=[];
   document.getElementById('bossHpWrap').style.display='none';
   GS.areaIdx=idx;
@@ -1940,7 +1941,7 @@ function useSkill(){
     const pierce=sk.type==='pierce';
     const spd=sk.id==='CosmicBeam'?12:sk.id==='GodWrath'?14:sk.id==='IceLance'?9:8;
     GS.projectiles.push({x:p.x,y:p.y,vx:aimVx/6*spd,vy:aimVy/6*spd,
-      type:projType,dmg:sk.dmg,life:140,pierce,skillCol:col,magicAtk:true});
+      type:projType,dmg:sk.dmg*5,life:140,pierce,skillCol:col,magicAtk:true}); // 貫通弾5倍威力
     addLog(`${sk.icon} ${sk.name}！`,'sys');
 
   } else if(sk.type==='nova'){
@@ -2801,9 +2802,9 @@ window.addEventListener('keydown',e=>{
       GS.shopOpen=false;GS.skillShopOpen=false;GS.itemShopOpen=false;GS.forgeOpen=false;
     } else if(GS.nearForge){openForge();}
     else if(GS.nearKirok){talkKirok();}
-    else if(GS.nearItems){renderItemShop();document.getElementById('itemShopOverlay').classList.remove('hidden');GS.itemShopOpen=true;}
-    else if(GS.nearShop){renderShop();document.getElementById('shopOverlay').classList.remove('hidden');GS.shopOpen=true;}
-    else if(GS.nearSkill){renderSkillShop();document.getElementById('skillShopOverlay').classList.remove('hidden');GS.skillShopOpen=true;}
+    else if(GS.nearItems){renderItemShop();document.getElementById('itemShopOverlay').classList.remove('hidden');GS.itemShopOpen=true;if(typeof updateJoyZone==='function') updateJoyZone();}
+    else if(GS.nearShop){renderShop();document.getElementById('shopOverlay').classList.remove('hidden');GS.shopOpen=true;updateJoyZone();}
+    else if(GS.nearSkill){renderSkillShop();document.getElementById('skillShopOverlay').classList.remove('hidden');GS.skillShopOpen=true;if(typeof updateJoyZone==='function') updateJoyZone();}
   }
   if(GAME_KEYS.has(e.code)) e.preventDefault();
 });
@@ -3195,8 +3196,13 @@ scaleGame();
 // ── TOUCH JOYSTICK ──────────────────────────────────────
 const jBase=document.getElementById('joystickBase');
 const jKnob=document.getElementById('joystickKnob');
+const jZone=document.getElementById('joystickZone');
 let jId=null,jOx=0,jOy=0;
 const JMAX=46;
+function updateJoyZone(){
+  const blocked=GS.shopOpen||GS.skillShopOpen||GS.itemMenuOpen||GS.forgeOpen||GS.itemShopOpen;
+  jZone.style.pointerEvents=blocked?'none':'all';
+}
 function jStart(cx,cy){
   // ショップ/スキル屋/アイテム屋が開いている間はスティック非表示
   if(GS.shopOpen||GS.skillShopOpen||GS.itemMenuOpen||GS.forgeOpen||GS.itemShopOpen) return;
