@@ -1223,6 +1223,12 @@ function updateHUD(){
   } else {
     if(AREAS[GS.areaIdx].id!=='norowareta') document.getElementById('waveNum').textContent=GS.wave;
   }
+  // ショップ中はjoystickZoneのタッチを無効化
+  const jZoneEl=document.getElementById('joystickZone');
+  if(jZoneEl){
+    const shopIsOpen=GS.shopOpen||GS.skillShopOpen||GS.itemMenuOpen||GS.forgeOpen||GS.itemShopOpen;
+    jZoneEl.style.pointerEvents=shopIsOpen?'none':'all';
+  }
   updateStatusPopup();
   const ac=document.getElementById('atkCd'),sc=document.getElementById('skillCd');
   if(GS.atkCd>0){ac.classList.remove('hidden');ac.textContent=Math.ceil(GS.atkCd/60);}else ac.classList.add('hidden');
@@ -3192,6 +3198,8 @@ const jKnob=document.getElementById('joystickKnob');
 let jId=null,jOx=0,jOy=0;
 const JMAX=46;
 function jStart(cx,cy){
+  // ショップ/スキル屋/アイテム屋が開いている間はスティック非表示
+  if(GS.shopOpen||GS.skillShopOpen||GS.itemMenuOpen||GS.forgeOpen||GS.itemShopOpen) return;
   jOx=cx;jOy=cy;
   jBase.style.left=cx+'px';jBase.style.top=cy+'px';
   jKnob.style.left=cx+'px';jKnob.style.top=cy+'px';
